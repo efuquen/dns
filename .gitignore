@@ -1,7 +1,8 @@
-bii/build
-bii/cmake
-bii/deps
-bii/lib
+bii
+!bii/.hive.db
+!bii/layout.bii
+!bii/policies.bii
+!bii/settings.bii
 bin/
 *swo
 *swp
