@@ -2,7 +2,6 @@ bii/build
 bii/cmake
 bii/deps
 bii/lib
-bii/.hive.db
 bin/
 *swo
 *swp
