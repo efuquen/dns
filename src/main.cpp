@@ -7,8 +7,10 @@
 #include <iostream>
 #include <stdexcept>
 #include <cstdint>
+#include <map>
 
 int main(int argc, char **argv) {
+  std::map<std::string, DNSPacket> cache;
   try {
     Poco::Net::SocketAddress sa("0.0.0.0", 53);
     Poco::Net::DatagramSocket dgs;

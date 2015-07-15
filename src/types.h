@@ -71,6 +71,7 @@ public:
 
   DNSQuestion(const uint8_t* buffer, int offset);
 	void toBytes(uint8_t* buffer, int offset);
+	std::string getName();
 
 private:
   friend std::ostream& operator<<(std::ostream&, const DNSQuestion&);
@@ -106,4 +107,5 @@ public:
 
   DNSPacket(const uint8_t* buffer);
 	uint8_t* toBytes();
+	std::string cacheKey();
 };

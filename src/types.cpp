@@ -1,5 +1,7 @@
 #include "types.h"
 
+#include <sstream>
+
 //Extract names from buffer, starting at offset.  Return octects moved through buffer.
 int setNames(const std::uint8_t* buffer, int offset, std::list<std::string>* names) {
   //Refers to previous name, call to grab with specified location. Only 2 octects consumed.
@@ -108,6 +110,19 @@ void DNSQuestion::toBytes(uint8_t* buffer, int offset) {
 		buffer[offset + 3] = qclass;
 }
 
+std::string DNSQuestion::getName() {
+	  std::ostringstream os;
+		int i = 0;
+		for(std::string qname : qnames) {
+			  os << qname;
+				if (i < qnames.size() - 1) {
+					  os << ".";
+				}
+				i++;
+		}
+		return os.str();
+}
+
 std::ostream& operator<<(std::ostream &stream, const DNSQuestion &dnsq) {
   stream << "DNSQuestion(qnames: [";
   for(std::list<std::string>::const_iterator i = dnsq.qnames.begin(); i != dnsq.qnames.end(); ++i) {
@@ -201,4 +216,11 @@ uint8_t* DNSPacket::toBytes() {
 				offset += dnsrr.size;
 		}
 		return buffer;
+}
+
+std::string DNSPacket::cacheKey() {
+	  DNSQuestion firstQuestion = this->questions.front();
+	  return firstQuestion.getName() + ":" +
+		  std::to_string(firstQuestion.qtype) + ":" +
+			std::to_string(firstQuestion.qclass);
 }
