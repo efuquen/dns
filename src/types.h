@@ -55,7 +55,8 @@ public:
   uint16_t nscount;
   uint16_t arcount;
 
-  DNSHeader(const std::uint8_t* header);
+  DNSHeader(const uint8_t* header);
+	void toBytes(uint8_t* buffer, int offset);
 
 private:
   friend std::ostream& operator<<(std::ostream&, const DNSHeader&);
@@ -68,7 +69,8 @@ public:
   uint16_t qclass;
   uint16_t size = 0;
 
-  DNSQuestion(const std::uint8_t* buffer, int offset);
+  DNSQuestion(const uint8_t* buffer, int offset);
+	void toBytes(uint8_t* buffer, int offset);
 
 private:
   friend std::ostream& operator<<(std::ostream&, const DNSQuestion&);
@@ -77,15 +79,19 @@ private:
 class DNSResourceRecord {
   public:
     std::list<std::string> names;
+		uint8_t compressed[2] = {0, 0};
     //TODO: Should have some DNSType, which only includes subset of QType
     uint16_t type;
     uint16_t clazz;
-    uint32_t  ttl;
-    uint16_t  rdlength;
+    uint32_t ttl;
+    uint16_t rdlength;
+		uint8_t  *rdata;
 
     uint16_t size = 0;
 
     DNSResourceRecord(const uint8_t* buffer, int offset);
+		~DNSResourceRecord();
+  	void toBytes(uint8_t* buffer, int offset);
 
   private:
     friend std::ostream& operator<<(std::ostream&, const DNSResourceRecord&);
@@ -93,10 +99,11 @@ class DNSResourceRecord {
 
 class DNSPacket {
 public:
-  DNSHeader *header;
+  DNSHeader header;
   std::list<DNSQuestion> questions;
   std::list<DNSResourceRecord> answers;
+	uint16_t size = 0;
 
-  DNSPacket(const std::uint8_t* buffer);
-  ~DNSPacket(); 
+  DNSPacket(const uint8_t* buffer);
+	uint8_t* toBytes();
 };

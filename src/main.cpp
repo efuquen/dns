@@ -30,8 +30,10 @@ int main(int argc, char **argv) {
       nsDGS.sendBytes(buffer, bytesReceived);
       bytesReceived = nsDGS.receiveBytes(buffer, sizeof(buffer));
       DNSPacket dnsrp(buffer);
+
       //TODO: cache answers
       dgs.sendTo(buffer, bytesReceived, sender);
+      dgs.sendTo(dnsrp.toBytes(), dnsrp.size, sender);
     }
 
     return 0;
