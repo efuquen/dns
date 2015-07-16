@@ -91,7 +91,6 @@ class DNSResourceRecord {
     uint16_t size = 0;
 
     DNSResourceRecord(const uint8_t* buffer, int offset);
-		~DNSResourceRecord();
   	void toBytes(uint8_t* buffer, int offset);
 
   private:
@@ -106,6 +105,7 @@ public:
 	uint16_t size = 0;
 
   DNSPacket(const uint8_t* buffer);
+  ~DNSPacket();
 	uint8_t* toBytes();
 	std::string cacheKey() const;
 

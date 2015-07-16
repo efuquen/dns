@@ -147,13 +147,6 @@ DNSResourceRecord::DNSResourceRecord(const uint8_t* buffer, int offset) {
 		std::copy(buffer + offset + nameSize + 10, buffer + offset + size, rdata);
 }
 
-DNSResourceRecord::~DNSResourceRecord() {
-	  /*std::cout << "Delete " << this << " " << *this << std::endl;
-	  delete[] rdata;
-		rdata = NULL;
-	  std::cout << "DeleteDone " << this << " " << *this << std::endl;*/
-}
-
 void DNSResourceRecord::toBytes(uint8_t* buffer, int offset) {
 	  if (compressed[0] != 0) {
 				buffer[offset] = compressed[0];
@@ -220,6 +213,13 @@ std::string DNSPacket::cacheKey() const {
 	  return firstQuestion.getName() + ":" +
 		  std::to_string(firstQuestion.qtype) + ":" +
 			std::to_string(firstQuestion.qclass);
+}
+
+DNSPacket::~DNSPacket() {
+  std::list <DNSResourceRecord>::iterator answer;
+  for(answer = this->answers.begin(); answer != this->answers.end(); ++answer) {
+    delete[] answer->rdata;
+  }
 }
 
 std::ostream& operator<<(std::ostream &stream, const DNSPacket &packet) {

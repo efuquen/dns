@@ -37,10 +37,10 @@ int main(int argc, char **argv) {
         bytesReceived = nsDGS.receiveBytes(buffer, sizeof(buffer));
         dnsrp = new DNSPacket(buffer);
         cache.put(dnsrp);
-        std::cout << "Got From Server: " << *dnsrp << std::endl;
+        std::cout << "Got From Server: " << dnsrp->header << std::endl;
       } else {
         dnsrp->header.id = dnsp.header.id;
-        std::cout << "Got From Cache: " << *dnsrp << std::endl;
+        std::cout << "Got From Cache: " << dnsrp->header << std::endl;
       }
 
       dgs.sendTo(dnsrp->toBytes(), dnsrp->size, sender);
