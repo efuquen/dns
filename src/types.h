@@ -107,5 +107,8 @@ public:
 
   DNSPacket(const uint8_t* buffer);
 	uint8_t* toBytes();
-	std::string cacheKey();
+	std::string cacheKey() const;
+
+private:
+    friend std::ostream& operator<<(std::ostream&, const DNSPacket&);
 };

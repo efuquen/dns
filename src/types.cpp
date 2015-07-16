@@ -186,18 +186,15 @@ std::ostream& operator<<(std::ostream &stream, const DNSResourceRecord &dnsrr) {
 }
 
 DNSPacket::DNSPacket(const uint8_t* buffer): header(buffer) {
-	  std::cout << header << std::endl;
 	  int offset = DNSHeader::SIZE;
 	  for (int i = 0; i < header.qdcount; i++) {
 	    DNSQuestion dnsq(buffer, offset);
 	    questions.push_back(dnsq);
-	    std::cout << dnsq << std::endl;
 	    offset += dnsq.size;
 	  }
 	  for (int i = 0; i < header.ancount; i++) {
 	    DNSResourceRecord dnsrr(buffer, offset);
 	    answers.push_back(dnsrr);
-	    std::cout << &dnsrr << " " << dnsrr << std::endl;
 	    offset += dnsrr.size;
 	  }
 		size = (uint16_t) offset;
@@ -218,9 +215,21 @@ uint8_t* DNSPacket::toBytes() {
 		return buffer;
 }
 
-std::string DNSPacket::cacheKey() {
+std::string DNSPacket::cacheKey() const {
 	  DNSQuestion firstQuestion = this->questions.front();
 	  return firstQuestion.getName() + ":" +
 		  std::to_string(firstQuestion.qtype) + ":" +
 			std::to_string(firstQuestion.qclass);
+}
+
+std::ostream& operator<<(std::ostream &stream, const DNSPacket &packet) {
+  stream << "DNSPacket(header: " << packet.header << ", questions: [";
+  for(DNSQuestion question: packet.questions) {
+    stream << question << ", ";
+  }
+  stream << "], answers: [";
+  for(DNSResourceRecord answer : packet.answers) {
+    stream << answer << ", ";
+  }
+  return stream << "])";
 }

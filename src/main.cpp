@@ -3,6 +3,7 @@
 #include "Poco/Exception.h"
 
 #include "types.h"
+#include "cache.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -10,7 +11,6 @@
 #include <map>
 
 int main(int argc, char **argv) {
-  std::map<std::string, DNSPacket> cache;
   try {
     Poco::Net::SocketAddress sa("0.0.0.0", 53);
     Poco::Net::DatagramSocket dgs;
@@ -23,19 +23,27 @@ int main(int argc, char **argv) {
     Poco::Net::DatagramSocket nsDGS;
     nsDGS.connect(nsSA);
 
+    DNSCache cache;
+
     for (;;) {
       Poco::Net::SocketAddress sender;
       int bytesReceived = dgs.receiveFrom(buffer, sizeof(buffer), sender);
       DNSPacket dnsp(buffer);
+      std::cout << "Question Packet: " << dnsp << std::endl;
 
-      //TODO: check cache for answers
-      nsDGS.sendBytes(buffer, bytesReceived);
-      bytesReceived = nsDGS.receiveBytes(buffer, sizeof(buffer));
-      DNSPacket dnsrp(buffer);
+      DNSPacket* dnsrp = cache.get(&dnsp);
+      if(dnsrp == NULL){
+        nsDGS.sendBytes(buffer, bytesReceived);
+        bytesReceived = nsDGS.receiveBytes(buffer, sizeof(buffer));
+        dnsrp = new DNSPacket(buffer);
+        cache.put(dnsrp);
+        std::cout << "Got From Server: " << *dnsrp << std::endl;
+      } else {
+        dnsrp->header.id = dnsp.header.id;
+        std::cout << "Got From Cache: " << *dnsrp << std::endl;
+      }
 
-      //TODO: cache answers
-      dgs.sendTo(buffer, bytesReceived, sender);
-      dgs.sendTo(dnsrp.toBytes(), dnsrp.size, sender);
+      dgs.sendTo(dnsrp->toBytes(), dnsrp->size, sender);
     }
 
     return 0;
